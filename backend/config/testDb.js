@@ -72,6 +72,10 @@ exports.query = async (sql, params = []) => {
     if (document) document.analysis = typeof params[0] === "string" ? JSON.parse(params[0]) : params[0];
     return result();
   }
+  if (query.startsWith("select id, filename, mime_type, analysis from documents")) {
+    const document = documents.find((item) => item.id === params[0] && item.user_id === params[1]);
+    return result(document ? [{ id: document.id, filename: document.filename, mime_type: document.mime_type, analysis: document.analysis }] : []);
+  }
   if (query.startsWith("select id, filename, extracted_text, analysis from documents")) {
     const document = documents.find((item) => item.id === params[0] && item.user_id === params[1]);
     return result(document ? [{ id: document.id, filename: document.filename, extracted_text: document.extracted_text, analysis: document.analysis }] : []);

@@ -10,8 +10,15 @@ const suggestions = [
   "What should I negotiate?",
 ];
 
-export default function AskClearClause({ documentId, filename, chunks }) {
-  const [messages, setMessages] = useState([]);
+export default function AskClearClause({ documentId, filename, chunks = [], showHeader = true }) {
+  const [messages, setMessages] = useState(() => {
+    try {
+      const saved = sessionStorage.getItem(`ask-clearclause:${documentId}`);
+      return saved ? JSON.parse(saved) : [];
+    } catch {
+      return [];
+    }
+  });
   const [question, setQuestion] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -25,7 +32,22 @@ export default function AskClearClause({ documentId, filename, chunks }) {
     endRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages, loading]);
 
-  useEffect(() => () => requestControllerRef.current?.abort(), []);
+  useEffect(() => {
+    return () => {
+      requestControllerRef.current?.abort();
+    };
+  }, []);
+
+  // Keep a conversation while the owner remains in this browser session. This
+  // is deliberately session-scoped: document conversations are not persisted
+  // to the server or leaked to another signed-in browser session.
+  useEffect(() => {
+    try {
+      sessionStorage.setItem(`ask-clearclause:${documentId}`, JSON.stringify(messages));
+    } catch {
+      // Storage can be unavailable in private browsing; chat still works.
+    }
+  }, [documentId, messages]);
 
   const sendQuestion = async (value = question) => {
     const trimmed = value.trim();
@@ -58,14 +80,14 @@ export default function AskClearClause({ documentId, filename, chunks }) {
 
   return (
     <section className="mt-8 rounded-[2rem] border border-[#D9EAFE] bg-[#F5F9FF] p-5 lg:p-7" aria-label="Ask ClearClause">
-      <div className="flex items-start justify-between gap-4">
+      {showHeader && <div className="flex items-start justify-between gap-4">
         <div>
           <p className="text-xs font-bold uppercase tracking-[0.18em] text-[#0057B8]">Document intelligence</p>
           <h2 className="mt-1 text-xl font-bold text-[#111827]">Ask ClearClause</h2>
           <p className="mt-1 text-sm text-[#5B6472]">Ask about <span className="font-semibold text-[#111827]">{filename}</span>{riskCount ? ` · ${riskCount} high-risk clause${riskCount > 1 ? "s" : ""} found` : ""}</p>
         </div>
         <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-[#0057B8] text-xl text-white">✦</div>
-      </div>
+      </div>}
 
       {!messages.length && !loading && (
         <div className="mt-6 rounded-2xl border border-white bg-white/80 p-4">

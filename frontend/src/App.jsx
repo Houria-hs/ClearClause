@@ -9,6 +9,7 @@ import Onboarding from './pages/Onboarding';
 import Terms from './pages/TermsAndServices';
 import VerifyEmailPending from './pages/VerifyEmailPending';
 import VerifyEmailSuccess from './pages/VerifyEmailSuccess';
+import AskClearClausePage from './pages/AskClearClausePage';
 
 function App() {
   const [user, setUser] = useState(null);
@@ -20,6 +21,7 @@ function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/TermsAndServices" element={<Terms />} />
         <Route path="/analyze" element={<PdfRiskAnalyzer user={user} />} />
+        <Route path="/ask-clearclause/:documentId" element={<AskClearClausePage />} />
         <Route path="/Onboarding" element={<Onboarding setUser={setUser} />} />
         <Route path="/verify-email-pending" element={<VerifyEmailPending />} />
         <Route path="/verify-email-success" element={<VerifyEmailSuccess />} />

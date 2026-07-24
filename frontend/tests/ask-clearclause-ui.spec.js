@@ -28,7 +28,16 @@ test("uploaded analysis opens Ask ClearClause and answers a suggested question",
     buffer: readFileSync(resolve("..", "backend", "uploads", "a6d9e622cbc409d28f2fef01dcf915fa")),
   });
 
-  await expect(page.getByRole("heading", { name: /ask clearclause/i })).toBeVisible({ timeout: 20000 });
+  const askButton = page.getByRole("button", { name: "Ask ClearClause" });
+  await expect(askButton).toBeVisible({ timeout: 20000 });
+  await askButton.click();
+  await expect(page).toHaveURL(/\/ask-clearclause\/[0-9a-f-]+$/);
+  await expect(page.getByRole("heading", { name: "Ask ClearClause" })).toBeVisible();
+  await expect(page.getByText("sample-agreement.pdf", { exact: true })).toBeVisible();
+  const dedicatedUrl = page.url();
+  await page.goto(dedicatedUrl);
+  await expect(page.getByRole("heading", { name: "Ask ClearClause" })).toBeVisible();
+  await page.setViewportSize({ width: 390, height: 844 });
   await page.getByRole("button", { name: /what are my biggest risks/i }).click();
   await expect(page.getByText(/ClearClause/, { exact: true }).last()).toBeVisible();
   await expect(page.getByText(/couldn't find a clear answer|based on this document/i)).toBeVisible({ timeout: 10000 });

@@ -29,6 +29,11 @@ test("Ask ClearClause only answers questions for the authenticated user's select
   expect(seed.status()).toBe(201);
   const { documentId } = await seed.json();
 
+  const document = await request.get(`${api}/documents/${documentId}`, { headers });
+  expect(document.status()).toBe(200);
+  expect((await document.json()).filename).toBe("Service agreement.pdf");
+  expect((await request.get(`${api}/documents/${documentId}`)).status()).toBe(401);
+
   const answer = await request.post(`${api}/documents/${documentId}/ask`, { headers, data: { question: "Can I terminate this agreement?" } });
   expect(answer.ok()).toBeTruthy();
   const body = await answer.json();
@@ -47,5 +52,6 @@ test("Ask ClearClause only answers questions for the authenticated user's select
   expect(providerFailure.status()).toBe(502);
 
   const otherToken = await createVerifiedUser(request, "other");
+  expect((await request.get(`${api}/documents/${documentId}`, { headers: { Authorization: `Bearer ${otherToken}` } })).status()).toBe(404);
   expect((await request.post(`${api}/documents/${documentId}/ask`, { headers: { Authorization: `Bearer ${otherToken}` }, data: { question: "Can I terminate?" } })).status()).toBe(404);
 });

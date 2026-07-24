@@ -24,6 +24,33 @@ router.post("/test/seed", verifyToken, async (req, res) => {
   }
 });
 
+// The chat page can be opened directly, so load its display metadata through
+// the same ownership boundary as the question endpoint. Do not return the
+// extracted document text to the browser.
+router.get("/:documentId", verifyToken, async (req, res) => {
+  const { documentId } = req.params;
+  if (!documentId) return res.status(400).json({ error: "A document is required." });
+
+  try {
+    const result = await pool.query(
+      "SELECT id, filename, mime_type, analysis FROM documents WHERE id = $1 AND user_id = $2",
+      [documentId, req.userId]
+    );
+    if (!result.rows.length) return res.status(404).json({ error: "Document not found or you do not have access." });
+
+    const document = result.rows[0];
+    return res.json({
+      id: document.id,
+      filename: document.filename,
+      mimeType: document.mime_type,
+      analysis: Array.isArray(document.analysis) ? document.analysis : [],
+    });
+  } catch (error) {
+    console.error("Document metadata error", { documentId, userId: req.userId, message: error.message });
+    return res.status(500).json({ error: "Unable to load this document." });
+  }
+});
+
 router.post("/:documentId/ask", verifyToken, async (req, res) => {
   const { documentId } = req.params;
   const question = typeof req.body.question === "string" ? req.body.question.trim() : "";

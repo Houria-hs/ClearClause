@@ -7,7 +7,6 @@ import { useNavigate } from "react-router-dom";
 import { pdf } from '@react-pdf/renderer';
 import { ResultExport } from "./ResultExport";
 import { API_URL } from "../config/api";
-import AskClearClause from "./AskClearClause";
 
 export default function PdfRiskAnalyzer() {
   const [file, setFile] = useState(null);
@@ -477,12 +476,18 @@ const handleLogout = () => {
                 onClick={handleDownload} 
             />
 
+            {documentId && <div className="mt-4">
+              <PremiumButton
+                text="Ask ClearClause"
+                onClick={() => navigate(`/ask-clearclause/${documentId}`)}
+              />
+            </div>}
+
             <h4 
             onClick={resetAnalyzer}
             className="text-xm text-center font-['Sora'] mt-6 mb-4 cursor-pointer text-[#0073FF]">
               Scan Again
             </h4>
-            {documentId && <AskClearClause documentId={documentId} filename={file?.name || "Uploaded document"} chunks={chunks} />}
             </div>
           )}
         </div>
