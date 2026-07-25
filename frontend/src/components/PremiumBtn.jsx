@@ -1,11 +1,12 @@
 import React from 'react';
 import grainImage from "../assets/grains.png"
 
-const PremiumButton = ({ text, onClick, className = "" }) => {
+const PremiumButton = ({ text, onClick, className = "", disabled = false }) => {
   return ( 
-    <div className='animate-in fade-in slide-in-from-bottom-4 duration-500 transition-transform hover:-translate-y-1'>
+    <div className={`animate-in fade-in slide-in-from-bottom-4 duration-500 transition-transform hover:-translate-y-1 ${className}`}>
           <button
             onClick={onClick}
+            disabled={disabled}
             className="
               relative w-full py-4 rounded-[12px] 
               leading-[20px]
@@ -14,7 +15,7 @@ const PremiumButton = ({ text, onClick, className = "" }) => {
               transition-all duration-200 active:scale-[0.97]
               overflow-hidden
               /* Base Linear Gradient from Figma styllee.png */
-              bg-gradient-to-b from-[#0073FF] to-[#0DA2FF]
+              bg-gradient-to-b from-[#0073FF] to-[#0DA2FF] disabled:cursor-not-allowed disabled:opacity-50
             "
             style={{
               /* Layered Shadows from Figma stylle.png & style2.png */

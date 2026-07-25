@@ -7,6 +7,7 @@ const { clientUrl } = require("./config/env.js");
 const authRoutes = require("./routes/authRoutes.js");
 const pdfRoutes = require("./routes/pdfRoutes.js");
 const documentRoutes = require("./routes/documentRoutes.js");
+const comparisonRoutes = require("./routes/comparisonRoutes.js");
 
 const app = express();
 
@@ -39,6 +40,7 @@ app.get("/health", (_req, res) => res.status(200).json({ status: "ok" }));
 app.use("/api/auth", authRoutes);
 app.use("/api/pdf", pdfRoutes);
 app.use("/api/documents", documentRoutes);
+app.use("/api/compare", comparisonRoutes);
 
 
 const PORT = process.env.PORT || 5000;

@@ -242,6 +242,11 @@ const handleLogout = () => {
                   <span className="text-[14px] font-bold font-['Sora']">Go back</span>
                 </button>
 
+                <button onClick={() => { navigate("/compare-contracts"); setIsMenuOpen(false); }} className="flex items-center gap-3 px-4 py-3.5 hover:bg-blue-50 rounded-2xl transition-colors text-[#0057B8] active:bg-blue-100">
+                  <span className="text-lg">⇄</span>
+                  <span className="text-[14px] font-bold font-['Sora']">Compare contracts</span>
+                </button>
+
                 {/* Divider */}
                 <div className="h-[1px] bg-gray-100 my-1 mx-2"></div>
 
