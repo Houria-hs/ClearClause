@@ -49,6 +49,9 @@ export default defineConfig({
     },
     {
       command: 'npm.cmd run dev',
+      env: {
+        VITE_API_URL: 'http://localhost:5000',
+      },
       url: 'http://localhost:5173',
       reuseExistingServer: false,
     },

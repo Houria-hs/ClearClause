@@ -10,6 +10,8 @@ const result = (rows = []) => ({ rows, rowCount: rows.length });
 exports.query = async (sql, params = []) => {
   const query = sql.replace(/\s+/g, " ").trim().toLowerCase();
 
+  if (query === "select 1") return result([{ "?column?": 1 }]);
+
   if (query.startsWith("select id from users where email")) {
     const user = users.find((item) => item.email === params[0]);
     return result(user ? [{ id: user.id }] : []);

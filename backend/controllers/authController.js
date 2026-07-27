@@ -7,6 +7,7 @@ const { clientUrl, backendUrl } = require("../config/env.js");
 require("dotenv").config();
 
 const normalizedEmail = (email) => String(email || "").trim().toLowerCase();
+const isDatabaseUnavailable = (error) => ["ENOTFOUND", "ETIMEDOUT", "ECONNREFUSED", "ECONNRESET", "08001", "08006", "57P01"].includes(error?.code);
 
 async function sendVerificationEmail({ email, username, verificationToken }) {
   const verifyUrl = `${backendUrl()}/api/auth/verify-email?token=${encodeURIComponent(verificationToken)}`;
@@ -60,7 +61,10 @@ exports.register = async (req, res) => {
 
     return res.status(201).json({ message: "Registration successful. Please check your email to verify your account." });
   } catch (err) {
-    console.error("Register error:", err.message);
+    console.error("Register error:", { code: err.code, message: err.message });
+    if (isDatabaseUnavailable(err)) {
+      return res.status(503).json({ message: "Registration is temporarily unavailable. Please try again shortly." });
+    }
     return res.status(500).json({ message: "Unable to create account. Please try again." });
   }
 };

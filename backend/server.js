@@ -8,6 +8,7 @@ const authRoutes = require("./routes/authRoutes.js");
 const pdfRoutes = require("./routes/pdfRoutes.js");
 const documentRoutes = require("./routes/documentRoutes.js");
 const comparisonRoutes = require("./routes/comparisonRoutes.js");
+const pool = require("./config/db.js");
 
 const app = express();
 
@@ -34,7 +35,15 @@ app.use(cors(corsOptions));
 app.options(/(.*)/, cors(corsOptions));
 app.use(express.json());
 
-app.get("/health", (_req, res) => res.status(200).json({ status: "ok" }));
+app.get("/health", async (_req, res) => {
+  try {
+    await pool.query("SELECT 1");
+    return res.status(200).json({ status: "ok" });
+  } catch (error) {
+    console.error("Health check database error:", { code: error.code, message: error.message });
+    return res.status(503).json({ status: "database_unavailable" });
+  }
+});
 
 // Routes
 app.use("/api/auth", authRoutes);

@@ -10,7 +10,10 @@ const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
   ssl: {
     rejectUnauthorized: false 
-  }
+  },
+  connectionTimeoutMillis: 10_000,
+  idleTimeoutMillis: 30_000,
+  keepAlive: true,
 });
 
 pool.on('connect', () => {
@@ -19,7 +22,8 @@ pool.on('connect', () => {
 
 pool.on('error', (err) => {
   console.error('Unexpected error on idle client', err);
-  process.exit(-1);
+  // A transient pooler/network failure must not terminate the Render process.
+  // Subsequent queries can establish a fresh connection through the pool.
 });
 pool.connect()
   .then(client => {
